@@ -1,0 +1,178 @@
+movies = LOAD '/Pig_Hive.csv' USING PigStorage(',') as (movieId:int, title:chararray, user_id:int, ratings:double, gener_id:int, Recommended:chararray, Activity_State:int);
+c1 = FILTER movies by movieId==3;
+g1 = Group c1 all;
+my_sum = FOREACH g1 GENERATE SUM(c1.$3);
+backup = STORE my_sum into '/output_record' USING PigStorage(',');
+dump my_sum;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+hdfs dfs -mkdir /bhartendoo
+hdfs dfs -mkdir /bhartendoo/vimal
+
+hdfs dfs -put Pig_Hive.csv /bhartendoo/vimal/
+
+hdfs dfs -ls /bhartendoo/vimal                   #contents of directory vimal
+
+hdfs dfs -cat /bhartendoo/vimal/Pig_Hive.csv     #
+
+hdfs dfs -get /bhartendoo/vimal/Pig_Hive.csv bar.txt   #
+
+hdfs dfs -rm /bhartendoo/vimal/Pig_Hive.csv
+hdfs dfs -rmdir /bhartendoo/vimal/
+###############################################################
+
+hdfs dfs -rmdir /bhartendoo/vimal/
+
+hdfs dfs -put Pig_Hive.csv /bhartendoo/vimal/   #any txt fil
+
+yarn jar /usr/hdp/current/hadoop-mapreduce-client/hadoop-mapreduce-examples.jar wordcount /bhartendoo/vimal/getthisfile.txt /bhartendoo/vimal/output/
+
+hdfs dfs -cat /bhartendoo/vimal/output/*		#display conent inside output file
+
+hadoop job -status job_1576593730801_00008
+
+hadoop job -list all
+
+
+Now to kill job
+do "yarn" command in one terminal and in other terminal as job id is created just kill it
+
+######################################################################
+
+
+
+hdfs dfs -put Pig_Hive /
+
+movies = LOAD '/Pig_Hive.csv' USING PigStorage(',') as (movieId:int, title:chararray, user_id:int, ratings:double, gener_id:int, Recommended:chararray, Activity_State:int);
+dump movies;
+
+>list = group movies by (movieId,ratings);
+>dump list;
+
+>q2 = filter movies by movieId==5;
+>dump q2;
+
+>q3 = group movies by (movieId,ratings);    >q3 = filter movies by ratings is NULL;
+>dump q3;				    >dump q3;
+
+>q4 = group movies by (user_id,movieId);
+>dump q4;
+
+>q5 = group movies all;
+
+>q5_AVG = foreach q5 generate AVG(movies.ratings) as a;
+>dump q5_AVG;
+
+>q5_MAX = foreach q5 generate MAX(movies.ratings) as m;
+>dump q5_MAX;
+
+>q5_MIN = foreach q5 generate MIN(movies.ratings) as n;
+>dump q5_MIN;
+
+
+>q5_FULL = foreach q5 GENERATE q5_MIN.n,q5_avg.a,q5_MAX.m;    #combine min max and avg
+>dump  q5_FULL;
+
+##############################################################
+
+
+
+movies = LOAD '/Pig_Hive.csv' USING PigStorage(',') as (movieId:int, title:chararray, user_id:int, ratings:double, gener_id:int, Recommended:chararray, Activity_State:int);
+bag1 = FOREACH movies generate TOBAG(movieId,title,user_id,ratings,gener_id,Recommended,Activity_State);
+dump bag1;
+
+
+movies = LOAD '/Pig_Hive.csv' USING PigStorage(',') as (movieId:int, title:chararray, user_id:int, ratings:double, gener_id:int, Recommended:chararray, Activity_State:int);
+lab4 = group movies all;
+lab4_SUM = FOREACH lab4 GENERATE SUM(movies.ratings);
+dump lab4_SUM;
+//remove "/" and run in local
+pig -x local q.pig
+
+
+
+movies = LOAD '/Pig_Hive.csv' USING PigStorage(',') as (movieId:int, title:chararray, user_id:int, ratings:double, gener_id:int, Recommended:chararray, Activity_State:int);
+c1 = FILTER movies by movieId==3;
+g1 = Group c1 all;
+my_sum = FOREACH g1 GENERATE SUM(c1.$3);
+backup = STORE my_sum into '/output_record' USING PigStorage(',');
+dump my_sum;
+
+hdfs dfs -cat /output_record/*
+
+#######################################################################################
+
+create database EXAM;
+use EXAM;
+create table movies1(movieId int,title string,user_id int,ratings double,gener_id int,Recommended string,Activity_State int) row format delimited fields terminated by ','stored as textfile;
+
+//movieid int
+//title string
+//user_id int
+//ratings double
+//gener_id int
+//recommended string
+//activity_state int
+
+LOAD DATA INPATH '/Pig_Hive.txt' OVERWRITE INTO TABLE movies1;
+
+select * from movies1 LIMIT 15;
+
+1.hive>select user_id,movieid, CASE when gener_id > 0 then gener_id ELSE -1 END gener_id, CASE recommended WHEN 'Y' THEN 1 ELSE 0 END recommended,activity_state FROM movies1 WHERE activity_state IN(2,4,5) LIMIT 20;
+
+
+2.hive> select user_id,movie_id,title FROM movies1 where activity_state ==2;
+
+3.hive> create table lab_5(movieid INT,gener_id INT,user_id INT,recommended STRING,activity_state INT) row format delimited feilds terminated by ',';
+  
+
+----->4.hive> INSERT OVERWRITE TABLE lab_5 SELECT * FROM (select user_id, movieid, CASE when gener_id > 0 THEN gener_id ELSE -1 END gener_id, CASE recommended WHEN 'Y' THEN 1 ELSE 0 END recommended, activity_state FROM movies1 WHERE activity_state IN(2,5,8))union_result;
+
+------>hive > select * from lab_5 LIMIT 15;
+
+
+ 
